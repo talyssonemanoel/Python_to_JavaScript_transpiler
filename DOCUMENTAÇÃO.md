@@ -18,27 +18,24 @@ No caso do Javascript, especificamente, essa passagem é bastante significativa 
     - RBRACE: Colchete direito }
     - COMMA: Vírgula ,
     - DOT: Ponto .
-Atribuições
 
-ASSIGN: Operador de atribuição =
-RETURN: Palavra-chave return
-Comandos Condicionais e Laços
+4. Atribuições
+    - ASSIGN: Operador de atribuição =
+    - RETURN: Palavra-chave return
 
-IF: Palavra-chave if
-ELIF: Palavra-chave elif (ou else if)
-ELSE: Palavra-chave else
-WHILE: Palavra-chave while
-FOR: Palavra-chave for (se necessário para laços)
-BREAK: Palavra-chave break (para saídas antecipadas do laço)
-CONTINUE: Palavra-chave continue (para pular iterações)
-Definição de Funções
+5. Comandos Condicionais e Laços
+    - IF: Palavra-chave if
+    - ELIF: Palavra-chave elif (ou else if)
+    - ELSE: Palavra-chave else
+    - WHILE: Palavra-chave while
+    
+6. Definição de Funções
+    - DEF: Palavra-chave def (para definição de funções)
+    - FUNCNAME: Nome da função (identificador após def)
 
-DEF: Palavra-chave def (para definição de funções)
-FUNCNAME: Nome da função (identificador após def)
-Outros Tokens
-
-NEWLINE: Quebra de linha (para identificar fim de uma instrução)
-EOF: Fim do arquivo (indica que não há mais tokens para ler)
-NUMBER: Literal numérico (e.g., 123, 45.67)
-STRING: Literais de string (se suportado, e.g., "texto")
-COMMENT: Comentários (se suportado, e.g., # comentário)
+7. Outros Tokens
+    - NEWLINE: Quebra de linha (para identificar fim de uma instrução)
+    - EOF: Fim do arquivo (indica que não há mais tokens para ler)
+    - NUMBER: Literal numérico (e.g., 123, 45.67)
+    - STRING: Literais de string (se suportado, e.g., "texto")
+    - COMMENT: Comentários (se suportado, e.g., # comentário)
