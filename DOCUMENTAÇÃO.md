@@ -57,3 +57,11 @@ return_statement ::= RETURN VAR NEWLINE
 
 ### Chamada de função
 function_call ::= VAR ASSIGN VAR LPAREN args RPAREN NEWLINE
+
+## Tutorial de como usar o código:
+1. Baixe o arquivo transpiler.py.
+2. Carregue-o em um ambiente de desenvolvimento Python.
+3. Navega até a pasta do arquivo utilizando o terminal.
+4. Utilize o comando pyhton 'transpiler.py'.
+5. Você poderá alterar o conteúdo da variável 'codigo_python' para testar outros códigos de Python paa JavaScript
+
