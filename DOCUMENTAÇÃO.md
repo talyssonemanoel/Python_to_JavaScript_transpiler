@@ -8,17 +8,16 @@ No caso do Javascript, especificamente, essa passagem é bastante significativa 
 ### Tokens Comuns
 1. Variáveis e Identificadores
     - VAR: Identificadores ou variáveis (e.g., x, resultado, soma).
-Operadores
+2. Operadores
+    - OPERATOR: Operadores aritméticos e relacionais (e.g., +, -, *, /, %, ==, !=, <, >, <=, >=, &&, ||).
 
-OPERATOR: Operadores aritméticos e relacionais (e.g., +, -, *, /, %, ==, !=, <, >, <=, >=, &&, ||).
-Delimitadores
-
-LPAREN: Parêntese esquerdo (
-RPAREN: Parêntese direito )
-LBRACE: Colchete esquerdo {
-RBRACE: Colchete direito }
-COMMA: Vírgula ,
-DOT: Ponto .
+3. Delimitadores
+    - LPAREN: Parêntese esquerdo (
+    - RPAREN: Parêntese direito )
+    - LBRACE: Colchete esquerdo {
+    - RBRACE: Colchete direito }
+    - COMMA: Vírgula ,
+    - DOT: Ponto .
 Atribuições
 
 ASSIGN: Operador de atribuição =
