@@ -7,7 +7,7 @@ No caso do Javascript, especificamente, essa passagem é bastante significativa 
 ## Tokens usados no transpilador:
 ### Tokens Comuns
 1. Variáveis e Identificadores
-  - VAR: Identificadores ou variáveis (e.g., x, resultado, soma).
+    - VAR: Identificadores ou variáveis (e.g., x, resultado, soma).
 Operadores
 
 OPERATOR: Operadores aritméticos e relacionais (e.g., +, -, *, /, %, ==, !=, <, >, <=, >=, &&, ||).
