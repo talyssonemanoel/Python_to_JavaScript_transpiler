@@ -444,7 +444,7 @@ codigo_python = """
 def somar(a, b):
     resultado = a + b
     return resultado
-y = somar(a, b)
+
 x = 3 + 5 * 2 - 8 / 4
 a = 5 > 3
 
