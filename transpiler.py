@@ -57,7 +57,6 @@ class Lexer:
         while self.caractere_atual is not None:
             if self.caractere_atual.isspace():
                 if self.caractere_atual == ' ':
-                    # Identifica nível de indentação
                     nivel_indentacao = self.identificar_indentacao()
                     if self.pos == 0 or self.texto[self.pos - 1] == '\n':
                         self.niveis_indentacao.append(nivel_indentacao)
@@ -68,7 +67,11 @@ class Lexer:
                 while self.caractere_atual is not None and (self.caractere_atual.isalnum() or self.caractere_atual == '_'):
                     palavra += self.caractere_atual
                     self.avancar()
-                if palavra == 'if':
+                if palavra == 'def':
+                    return Token('DEF', 'def')
+                elif palavra == 'return':
+                    return Token('RETURN', 'return')
+                elif palavra == 'if':
                     return Token('IF', 'if')
                 elif palavra == 'elif':
                     return Token('ELIF', 'elif')
@@ -123,8 +126,24 @@ class Lexer:
             if self.caractere_atual == '\n':
                 self.avancar()
                 return Token('NEWLINE', '\n')
+            if self.caractere_atual == '(':
+                self.avancar()
+                return Token('LPAREN', '(')
+            if self.caractere_atual == ')':
+                self.avancar()
+                return Token('RPAREN', ')')
+            if self.caractere_atual == ',':
+                self.avancar()
+                return Token('COMMA', ',')
+            if self.caractere_atual == ':':
+                self.avancar()
+                return Token('COLON', ':')
+            if self.caractere_atual == ';':
+                self.avancar()
+                return Token('SEMICOLON', ';')
             self.error()
         return Token('EOF', None)
+
 
 
 class Parser:
@@ -321,17 +340,74 @@ class Parser:
         loop.append("}")
         return loop
     
-    def parse_atribuicao(self):
-        """Parse atribuições"""
-        atribuicoes = []
-        while self.token_atual.tipo != 'EOF':
+    def parse_funcao(self):
+        """Parse uma definição de função"""
+        self.consumir('DEF')
+        nome_funcao = self.token_atual.valor
+        self.consumir('VAR')
+        self.consumir('LPAREN')
+        
+        parametros = []
+        while self.token_atual.tipo == 'VAR':
+            parametros.append(self.token_atual.valor)
+            self.consumir('VAR')
+            if self.token_atual.tipo == 'COMMA':
+                self.consumir('COMMA')
+        
+        self.consumir('RPAREN')
+        self.consumir('COLON')
+        self.ignorar_newline()
+        
+        corpo = []
+        while self.token_atual.tipo not in ('EOF', 'NEWLINE', 'DEF'):
             if self.token_atual.tipo == 'VAR':
                 variavel = self.token_atual.valor
                 self.consumir('VAR')
                 self.consumir('ASSIGN')
                 expressao = self.parse_expressao()
-                atribuicoes.append(f"var {variavel} = {expressao};")
+                corpo.append(f"    var {variavel} = {expressao};")
                 self.ignorar_newline()
+            elif self.token_atual.tipo == 'IF':
+                corpo.extend(self.parse_if())
+            elif self.token_atual.tipo == 'WHILE':
+                corpo.extend(self.parse_while())
+            elif self.token_atual.tipo == 'RETURN':
+                self.consumir('RETURN')
+                expressao = self.parse_expressao()
+                corpo.insert(0, f"function {nome_funcao}({', '.join(parametros)}) {{")
+                corpo.append(f"    return {expressao};")
+                corpo.append("}")
+                self.ignorar_newline()
+                return corpo
+            elif self.token_atual.tipo == 'NEWLINE':
+                self.ignorar_newline()
+            else:
+                print(f"Erro na análise da função. Token atual: {self.token_atual}")
+                self.error()
+        
+        corpo.insert(0, f"function {nome_funcao}({', '.join(parametros)}) {{")
+        corpo.append("}")
+        
+        return corpo
+
+
+    
+    def parse_atribuicao(self):
+        """Parse atribuições e chamadas de funções"""
+        atribuicoes = []
+        while self.token_atual.tipo != 'EOF':
+            if self.token_atual.tipo == 'VAR':
+                variavel = self.token_atual.valor
+                self.consumir('VAR')
+                if self.token_atual.tipo == 'ASSIGN':
+                    self.consumir('ASSIGN')
+                    expressao = self.parse_expressao()
+                    atribuicoes.append(f"var {variavel} = {expressao};")
+                    self.ignorar_newline()
+                elif self.token_atual.tipo == 'LPAREN':
+                    chamada = self.parse_chamada_funcao()
+                    atribuicoes.append(f"{chamada};")
+                    self.ignorar_newline()
             elif self.token_atual.tipo == 'WHILE':
                 atribuicoes.extend(self.parse_while())
             elif self.token_atual.tipo == 'IF':
@@ -340,6 +416,8 @@ class Parser:
                 atribuicoes.extend(self.parse_elif())
             elif self.token_atual.tipo == 'ELSE':
                 atribuicoes.extend(self.parse_else())
+            elif self.token_atual.tipo == 'DEF':
+                atribuicoes.extend(self.parse_funcao())
             elif self.token_atual.tipo == 'NEWLINE':
                 self.ignorar_newline()
             else:
@@ -358,13 +436,18 @@ def transpilar(codigo_python):
     for nivel in lexer.niveis_indentacao:
         print(f"Nível de indentação: {nivel}")
     return "\n".join(parser.parse_atribuicao())
+
     
 
 # Exemplo de uso
 codigo_python = """
-y = 1
+def somar(a, b):
+    resultado = a + b
+    return resultado
+y = somar(a, b)
 x = 3 + 5 * 2 - 8 / 4
 a = 5 > 3
+
 b = x == 10 || y != 1
 while x < 10
     x = x + 7
