@@ -39,3 +39,21 @@ No caso do Javascript, especificamente, essa passagem é bastante significativa 
     - NUMBER: Literal numérico (e.g., 123, 45.67)
     - STRING: Literais de string (se suportado, e.g., "texto")
     - COMMENT: Comentários (se suportado, e.g., # comentário)
+
+## Gramática utilizada
+### Definição de função
+function_def ::= DEF VAR LPAREN params RPAREN NEWLINE function_body
+params ::= VAR (COMMA VAR)*
+function_body ::= assignment* return_statement
+
+### Atribuição
+assignment ::= VAR ASSIGN expression NEWLINE
+
+### Expressão
+expression ::= VAR (OPERATOR VAR)*
+
+### Retorno
+return_statement ::= RETURN VAR NEWLINE
+
+### Chamada de função
+function_call ::= VAR ASSIGN VAR LPAREN args RPAREN NEWLINE
