@@ -64,4 +64,5 @@ function_call ::= VAR ASSIGN VAR LPAREN args RPAREN NEWLINE
 3. Navega até a pasta do arquivo utilizando o terminal.
 4. Utilize o comando pyhton 'transpiler.py'.
 5. Você poderá alterar o conteúdo da variável 'codigo_python' para testar outros códigos de Python paa JavaScript
+6. Importante levar em consideração que o transpilador foi desenvolvido apenas para converter os comandos 'atribuição de variável', 'expressões aritméticas de até 4 operações', 'comando condificonal if/else', 'operações lógicos', 'laço de repetição while', 'declaração de funções' e 'chamada de funções'. Qualquer algoritmo que fuja desses comandos poderá apresentar falha na sua transpilação
 
