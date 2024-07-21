@@ -33,11 +33,23 @@ class Lexer:
             self.avancar()
 
     def identificar_variavel(self):
-        resultado = ''
-        while self.caractere_atual is not None and (self.caractere_atual.isalnum() or self.caractere_atual == '_'):
-            resultado += self.caractere_atual
-            self.avancar()
-        return Token('VAR', resultado)
+      resultado = ''
+      while self.caractere_atual is not None and (self.caractere_atual.isalnum() or self.caractere_atual == '_'):
+          resultado += self.caractere_atual
+          self.avancar()
+      
+      # Verificar se o próximo caractere é um parêntese de abertura
+      if self.caractere_atual == '(':
+          token = Token('FUNC_CALL', resultado)
+      else:
+          token = Token('VAR', resultado)
+      
+      # Exibir o token analisado e o resultado retornado
+      print(f"Token analisado: {resultado}, Resultado: {token.tipo}")
+
+      return token
+
+
 
     def identificar_numero(self):
         resultado = ''
@@ -220,6 +232,7 @@ class Parser:
         condicional = []
         self.consumir('IF')
         condicao = self.parse_expressao()
+        self.consumir('COLON')
         condicional.append(f"if ({condicao}) {{")
         self.ignorar_newline()
 
@@ -250,6 +263,7 @@ class Parser:
         while self.token_atual.tipo == 'ELIF':
             self.consumir('ELIF')
             condicao = self.parse_expressao()
+            self.consumir('COLON')
             condicional.append(f"else if ({condicao}) {{")
             self.ignorar_newline()
 
@@ -277,6 +291,7 @@ class Parser:
 
         if self.token_atual.tipo == 'ELSE':
             self.consumir('ELSE')
+            self.consumir('COLON')
             condicional.append("else {")
             self.ignorar_newline()
 
@@ -284,14 +299,35 @@ class Parser:
                 if self.token_atual.tipo == 'VAR':
                     variavel = self.token_atual.valor
                     self.consumir('VAR')
-                    self.consumir('ASSIGN')
-                    expressao = self.parse_expressao()
-                    condicional.append(f"    var {variavel} = {expressao};")
+                    if self.token_atual.tipo == 'ASSIGN':
+                        self.consumir('ASSIGN')
+                        expressao = self.parse_expressao()
+                        condicional.append(f"var {variavel} = {expressao};")
+                        self.ignorar_newline()
+                    elif self.token_atual.tipo == 'LPAREN':
+                        chamada = self.parse_chamada_funcao(variavel)
+                        condicional.append(f"{chamada};")
+                        self.ignorar_newline()
+                elif self.token_atual.tipo == 'FUNC_CALL':
+                    nome_funcao = self.token_atual.valor
+                    self.consumir('FUNC_CALL')
+                    chamada = self.parse_chamada_funcao(nome_funcao)
+                    condicional.append(f"{chamada};")
                     self.ignorar_newline()
+                elif self.token_atual.tipo == 'WHILE':
+                    condicional.extend(self.parse_while())
+                elif self.token_atual.tipo == 'IF':
+                    condicional.extend(self.parse_if())
+                elif self.token_atual.tipo == 'ELIF':
+                    condicional.extend(self.parse_elif())
+                elif self.token_atual.tipo == 'ELSE':
+                    condicional.extend(self.parse_else())
+                elif self.token_atual.tipo == 'DEF':
+                    condicional.extend(self.parse_funcao())
                 elif self.token_atual.tipo == 'NEWLINE':
                     self.ignorar_newline()
                 else:
-                    print(f"Erro na análise else. Token atual: {self.token_atual}")
+                    print(f"Erro na análise. Token atual: {self.token_atual}")
                     self.error()
 
             condicional.append("}")
@@ -303,6 +339,7 @@ class Parser:
         loop = []
         self.consumir('WHILE')
         condicao = self.parse_expressao()
+        self.consumir('COLON')
         loop.append(f"while ({condicao}) {{")
         self.ignorar_newline()
 
@@ -373,6 +410,7 @@ class Parser:
                 corpo.extend(self.parse_while())
             elif self.token_atual.tipo == 'RETURN':
                 self.consumir('RETURN')
+                print("Deu erro?")
                 expressao = self.parse_expressao()
                 corpo.insert(0, f"function {nome_funcao}({', '.join(parametros)}) {{")
                 corpo.append(f"    return {expressao};")
@@ -390,41 +428,59 @@ class Parser:
         
         return corpo
 
+    def parse_chamada_funcao(self, nome_funcao):
+      self.consumir('LPAREN')
+      
+      argumentos = []
+      while self.token_atual.tipo != 'RPAREN':
+          argumentos.append(self.parse_expressao())
+          if self.token_atual.tipo == 'COMMA':
+              self.consumir('COMMA')
+      
+      self.consumir('RPAREN')
+      return f"{nome_funcao}({', '.join(argumentos)})"
 
     
     def parse_atribuicao(self):
-        """Parse atribuições e chamadas de funções"""
-        atribuicoes = []
-        while self.token_atual.tipo != 'EOF':
-            if self.token_atual.tipo == 'VAR':
-                variavel = self.token_atual.valor
-                self.consumir('VAR')
-                if self.token_atual.tipo == 'ASSIGN':
-                    self.consumir('ASSIGN')
-                    expressao = self.parse_expressao()
-                    atribuicoes.append(f"var {variavel} = {expressao};")
-                    self.ignorar_newline()
-                elif self.token_atual.tipo == 'LPAREN':
-                    chamada = self.parse_chamada_funcao()
-                    atribuicoes.append(f"{chamada};")
-                    self.ignorar_newline()
-            elif self.token_atual.tipo == 'WHILE':
-                atribuicoes.extend(self.parse_while())
-            elif self.token_atual.tipo == 'IF':
-                atribuicoes.extend(self.parse_if())
-            elif self.token_atual.tipo == 'ELIF':
-                atribuicoes.extend(self.parse_elif())
-            elif self.token_atual.tipo == 'ELSE':
-                atribuicoes.extend(self.parse_else())
-            elif self.token_atual.tipo == 'DEF':
-                atribuicoes.extend(self.parse_funcao())
-            elif self.token_atual.tipo == 'NEWLINE':
-                self.ignorar_newline()
-            else:
-                print(f"Erro na análise. Token atual: {self.token_atual}")
-                self.error()
+      """Parse atribuições e chamadas de funções"""
+      atribuicoes = []
+      while self.token_atual.tipo != 'EOF':
+          if self.token_atual.tipo == 'VAR':
+              variavel = self.token_atual.valor
+              self.consumir('VAR')
+              if self.token_atual.tipo == 'ASSIGN':
+                  self.consumir('ASSIGN')
+                  expressao = self.parse_expressao()
+                  atribuicoes.append(f"var {variavel} = {expressao};")
+                  self.ignorar_newline()
+              elif self.token_atual.tipo == 'LPAREN':
+                  chamada = self.parse_chamada_funcao(variavel)
+                  atribuicoes.append(f"{chamada};")
+                  self.ignorar_newline()
+          elif self.token_atual.tipo == 'FUNC_CALL':
+              nome_funcao = self.token_atual.valor
+              self.consumir('FUNC_CALL')
+              chamada = self.parse_chamada_funcao(nome_funcao)
+              atribuicoes.append(f"{chamada};")
+              self.ignorar_newline()
+          elif self.token_atual.tipo == 'WHILE':
+              atribuicoes.extend(self.parse_while())
+          elif self.token_atual.tipo == 'IF':
+              atribuicoes.extend(self.parse_if())
+          elif self.token_atual.tipo == 'ELIF':
+              atribuicoes.extend(self.parse_elif())
+          elif self.token_atual.tipo == 'ELSE':
+              atribuicoes.extend(self.parse_else())
+          elif self.token_atual.tipo == 'DEF':
+              atribuicoes.extend(self.parse_funcao())
+          elif self.token_atual.tipo == 'NEWLINE':
+              self.ignorar_newline()
+          else:
+              print(f"Erro na análise. Token atual: {self.token_atual}")
+              self.error()
 
-        return atribuicoes
+      return atribuicoes
+
 
 
 
@@ -441,24 +497,19 @@ def transpilar(codigo_python):
 
 # Exemplo de uso
 codigo_python = """
-def somar(a, b):
-    resultado = a + b
-    return resultado
-
-x = 3 + 5 * 2 - 8 / 4
-a = 5 > 3
-
-b = x == 10 || y != 1
-while x < 10
-    x = x + 7
-if x > 5
-    y = 10
-elif x == 3
-    y = 20
-elif x == 3
-    y = 20
-else
-    y = 30
+def function(param1, param2):
+  return 0
+function(para1, para2)
+x = 1
+x = y
+if x<y:
+  x = x+y
+elif y<x:
+  x = x_y
+else:
+  x = x*y
+while x<y:
+  x = x+y
 """
 
 codigo_javascript = transpilar(codigo_python)
