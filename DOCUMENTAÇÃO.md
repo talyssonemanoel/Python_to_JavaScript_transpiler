@@ -42,25 +42,25 @@ No caso do Javascript, especificamente, essa passagem é bastante significativa 
     - COMMENT: Comentários (se suportado, e.g., # comentário)
 
 ## Gramática utilizada
-S → declaraVar S | DeclaraFunção S | chamaFunção S | While S | If S | 𝜆
+- S → declaraVar S | DeclaraFunção S | chamaFunção S | While S | If S | 𝜆
 
-declaraVar → VAR | VAR = VALOR
+- declaraVar → VAR | VAR = VALOR
 
-VALOR → NUM | NUM OPERATOR VALOR
+- VALOR → NUM | NUM OPERATOR VALOR
 
-declaraFunção → DEF chamaFunção COLON NEWLINE\t S
+- declaraFunção → DEF chamaFunção COLON NEWLINE\t S
 
-chamaFunção → VAR LPAREN params RPAREN
+- chamaFunção → VAR LPAREN params RPAREN
 
-While → WHILE LPAREN params RPAREN NEWLINE\t S
+- While → WHILE LPAREN params RPAREN NEWLINE\t S
 
-params → VAR | VAR COMMA params
+- params → VAR | VAR COMMA params
 
-IF → if LPAREN condição RPAREN COLON NEWLINE\t S | if (condição) COLON NEWLINE\t S NEWLINE ELIF
+- IF → if LPAREN condição RPAREN COLON NEWLINE\t S | if (condição) COLON NEWLINE\t S NEWLINE ELIF
 
-ELIF → elif (condição) COLON NEWLINE\t S | elif (condição) COLON NEWLINE\t S NEWLINE ELSE COLON S
+- ELIF → elif (condição) COLON NEWLINE\t S | elif (condição) COLON NEWLINE\t S NEWLINE ELSE COLON S
 
-condição → VAR opLogico VAR | VAR OPERATOR NUM | NUM OPERATOR VAR | NUM OPERATOR NUM
+- condição → VAR opLogico VAR | VAR OPERATOR NUM | NUM OPERATOR VAR | NUM OPERATOR NUM
 
 ### Definição de função
 function_def ::= DEF VAR LPAREN params RPAREN NEWLINE function_body
