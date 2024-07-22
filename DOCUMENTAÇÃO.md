@@ -17,6 +17,7 @@ No caso do Javascript, especificamente, essa passagem é bastante significativa 
     - LBRACE: Colchete esquerdo {
     - RBRACE: Colchete direito }
     - COMMA: Vírgula ,
+    - 
     - DOT: Ponto .
 
 4. Atribuições
@@ -41,9 +42,20 @@ No caso do Javascript, especificamente, essa passagem é bastante significativa 
     - COMMENT: Comentários (se suportado, e.g., # comentário)
 
 ## Gramática utilizada
+S → declaraVar S | DeclaraFunção S | chamaFunção S | While S | If S | 𝜆
+declaraVar → VAR | VAR = VALOR
+VALOR → NUM | NUM OPERATOR VALOR
+declaraFunção → DEF chamaFunção:NEWLINE\t S
+chamaFunção → VAR LPAREN params RPAREN
+While → WHILE LPAREN params RPAREN NEWLINE\t S
+params → VAR | VAR COMMA params
+IF → if LPAREN condição RPAREN : NEWLINE\t S | if (condição):NEWLINE\t S NEWLINE ELIF
+ELIF → elif (condição):NEWLINE\t S | elif (condição):NEWLINE\t S NEWLINE else: S
+condição → VAR opLogico VAR | VAR OPERATOR NUM | NUM OPERATOR VAR | NUM OPERATOR NUM
+
 ### Definição de função
 function_def ::= DEF VAR LPAREN params RPAREN NEWLINE function_body
-params ::= VAR (COMMA VAR)*
+params ::= VAR LPAREN COMMA VAR RPAREN*
 function_body ::= assignment* return_statement
 
 ### Atribuição
